@@ -37,7 +37,10 @@
                                 <th>Modèle</th>
                                 <th>Immatriculation</th>
                                 <th>Heures Total</th>
+                                <th>Carburant Restant</th>
                                 <th>Statut</th>
+                                <th>Dernière Maintenance</th>
+                                <th>Prochaine Maintenance</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -94,6 +97,7 @@
                                 <th>Heures Fin</th>
                                 <th>Durée</th>
                                 <th>Pilote</th>
+                                <th>Carburant Consommé</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -165,7 +169,6 @@
                                 <th>Description</th>
                                 <th>Statut</th>
                                 <th>Techniciens</th>
-                                <th>Documents</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -199,7 +202,6 @@
                                 <th>Prénom</th>
                                 <th>Matricule</th>
                                 <th>Qualification</th>
-                                <th>Email</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -264,11 +266,26 @@
                     <input type="number" id="appareil-heures" step="0.1" min="0" required>
                 </div>
                 <div class="form-group">
+                    <label>Quantité de Carburant Restante (litres):</label>
+                    <input type="number" id="appareil-carburant" step="0.1" min="0" placeholder="Ex: 500.0" required>
+                    <small>Quantité actuelle de carburant dans le réservoir</small>
+                </div>
+                <div class="form-group">
                     <label>Statut:</label>
                     <select id="appareil-statut" required>
                         <option value="disponible">Disponible</option>
                         <option value="indisponible">Indisponible</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Prochaine Maintenance Programmée (Date):</label>
+                    <input type="date" id="appareil-prochaine-maintenance">
+                    <small>Date prévue pour la prochaine maintenance</small>
+                </div>
+                <div class="form-group">
+                    <label>Prochaine Maintenance Programmée (Heures):</label>
+                    <input type="number" id="appareil-prochaine-maintenance-heures" step="0.1" min="0" placeholder="Ex: 1300.5">
+                    <small>Heures de vol prévues pour la prochaine maintenance</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>
@@ -301,6 +318,11 @@
                 <div class="form-group">
                     <label>Pilote:</label>
                     <input type="text" id="vol-pilote" required>
+                </div>
+                <div class="form-group">
+                    <label>Carburant Consommé (litres):</label>
+                    <input type="number" id="vol-carburant-consomme" step="0.1" min="0" placeholder="Ex: 150.5" required>
+                    <small>La quantité de carburant restante sera automatiquement mise à jour</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>
@@ -374,10 +396,6 @@
                     <select id="tache-techniciens" multiple required></select>
                     <small>Sélectionnez plusieurs techniciens (Ctrl+clic)</small>
                 </div>
-                <div class="form-group">
-                    <label>Documents (URLs séparées par des virgules):</label>
-                    <textarea id="tache-documents" rows="2" placeholder="https://exemple.com/doc1.pdf, https://exemple.com/doc2.pdf"></textarea>
-                </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>
         </div>
@@ -405,10 +423,6 @@
                 <div class="form-group">
                     <label>Qualification:</label>
                     <input type="text" id="technicien-qualification" required>
-                </div>
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" id="technicien-email" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>

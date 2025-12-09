@@ -209,13 +209,21 @@ document.getElementById('form-appareil').addEventListener('submit', (e) => {
     e.preventDefault();
     const appareils = Storage.get(STORAGE_KEYS.appareils);
     const id = document.getElementById('appareil-id').value;
+    const prochaineMaintenanceDate = document.getElementById('appareil-prochaine-maintenance').value;
+    const prochaineMaintenanceHeures = document.getElementById('appareil-prochaine-maintenance-heures').value;
+    
+    const carburantRestant = parseFloat(document.getElementById('appareil-carburant').value) || 0;
+    
     const appareil = {
         id: id || Date.now().toString(),
         type: document.getElementById('appareil-type').value,
         modele: document.getElementById('appareil-modele').value,
         immatriculation: document.getElementById('appareil-immatriculation').value,
         heuresTotal: parseFloat(document.getElementById('appareil-heures').value),
-        statut: document.getElementById('appareil-statut').value
+        carburantRestant: carburantRestant,
+        statut: document.getElementById('appareil-statut').value,
+        prochaineMaintenanceDate: prochaineMaintenanceDate || null,
+        prochaineMaintenanceHeures: prochaineMaintenanceHeures ? parseFloat(prochaineMaintenanceHeures) : null
     };
     
     if (id) {
@@ -247,7 +255,10 @@ function editAppareil(id) {
         document.getElementById('appareil-modele').value = appareil.modele;
         document.getElementById('appareil-immatriculation').value = appareil.immatriculation;
         document.getElementById('appareil-heures').value = appareil.heuresTotal;
+        document.getElementById('appareil-carburant').value = appareil.carburantRestant || 0;
         document.getElementById('appareil-statut').value = appareil.statut || 'disponible';
+        document.getElementById('appareil-prochaine-maintenance').value = appareil.prochaineMaintenanceDate || '';
+        document.getElementById('appareil-prochaine-maintenance-heures').value = appareil.prochaineMaintenanceHeures || '';
         openModal('modal-appareil');
     }
 }
@@ -266,6 +277,8 @@ document.getElementById('form-vol').addEventListener('submit', (e) => {
         return;
     }
     
+    const carburantConsomme = parseFloat(document.getElementById('vol-carburant-consomme').value) || 0;
+    
     const vol = {
         id: id || Date.now().toString(),
         date: document.getElementById('vol-date').value,
@@ -273,7 +286,8 @@ document.getElementById('form-vol').addEventListener('submit', (e) => {
         heuresDebut: heuresDebut,
         heuresFin: heuresFin,
         duree: duree,
-        pilote: document.getElementById('vol-pilote').value
+        pilote: document.getElementById('vol-pilote').value,
+        carburantConsomme: carburantConsomme
     };
     
     if (id) {
@@ -281,11 +295,14 @@ document.getElementById('form-vol').addEventListener('submit', (e) => {
         vols[index] = vol;
     } else {
         vols.push(vol);
-        // Mettre à jour les heures totales de l'appareil
+        // Mettre à jour les heures totales et le carburant restant de l'appareil
         const appareils = Storage.get(STORAGE_KEYS.appareils);
         const appareil = appareils.find(a => a.id === vol.appareilId);
         if (appareil) {
             appareil.heuresTotal = heuresFin;
+            // Mettre à jour le carburant restant
+            const carburantActuel = appareil.carburantRestant || 0;
+            appareil.carburantRestant = Math.max(0, carburantActuel - carburantConsomme);
             Storage.set(STORAGE_KEYS.appareils, appareils);
         }
     }
@@ -543,10 +560,6 @@ document.getElementById('form-tache').addEventListener('submit', (e) => {
     const taches = Storage.get(STORAGE_KEYS.taches);
     const id = document.getElementById('tache-id').value;
     const techniciensIds = Array.from(document.getElementById('tache-techniciens').selectedOptions).map(o => o.value);
-    const documents = document.getElementById('tache-documents').value
-        .split(',')
-        .map(d => d.trim())
-        .filter(d => d);
     
     const tache = {
         id: id || Date.now().toString(),
@@ -556,8 +569,7 @@ document.getElementById('form-tache').addEventListener('submit', (e) => {
         manuelId: document.getElementById('tache-manuel').value,
         description: document.getElementById('tache-description').value,
         statut: document.getElementById('tache-statut').value,
-        techniciensIds: techniciensIds,
-        documents: documents
+        techniciensIds: techniciensIds
     };
     
     if (id) {
@@ -590,7 +602,6 @@ function editTache(id) {
         document.getElementById('tache-maintenance-type').value = tache.maintenanceTypeId;
         document.getElementById('tache-description').value = tache.description;
         document.getElementById('tache-statut').value = tache.statut;
-        document.getElementById('tache-documents').value = tache.documents ? tache.documents.join(', ') : '';
         
         populateAppareilsSelect('tache-appareil');
         populateMaintenanceTypesSelect('tache-maintenance-type');
@@ -631,8 +642,7 @@ document.getElementById('form-technicien').addEventListener('submit', (e) => {
         nom: document.getElementById('technicien-nom').value,
         prenom: document.getElementById('technicien-prenom').value,
         matricule: document.getElementById('technicien-matricule').value,
-        qualification: document.getElementById('technicien-qualification').value,
-        email: document.getElementById('technicien-email').value
+        qualification: document.getElementById('technicien-qualification').value
     };
     
     if (id) {
@@ -664,7 +674,6 @@ function editTechnicien(id) {
         document.getElementById('technicien-prenom').value = technicien.prenom;
         document.getElementById('technicien-matricule').value = technicien.matricule;
         document.getElementById('technicien-qualification').value = technicien.qualification;
-        document.getElementById('technicien-email').value = technicien.email;
         openModal('modal-technicien');
     }
 }
@@ -859,6 +868,7 @@ function convertirReserveDirecte(reserveId) {
 
 function loadAppareils() {
     const appareils = Storage.get(STORAGE_KEYS.appareils);
+    const taches = Storage.get(STORAGE_KEYS.taches);
     const tbody = document.getElementById('tbody-appareils');
     tbody.innerHTML = '';
     
@@ -867,6 +877,63 @@ function loadAppareils() {
         const statutClass = statut === 'disponible' ? 'badge-terminee' : 'badge-planifiee';
         const statutLabel = statut === 'disponible' ? 'Disponible' : 'Indisponible';
         
+        // Afficher le carburant restant avec alertes
+        const carburantRestant = appareil.carburantRestant || 0;
+        let carburantDisplay = `${carburantRestant.toFixed(1)} L`;
+        if (carburantRestant <= 50) {
+            carburantDisplay = `<span style="color: #e74c3c; font-weight: bold;">${carburantRestant.toFixed(1)} L</span><br><small style="color: #e74c3c;">⚠️ Réservoir faible</small>`;
+        } else if (carburantRestant <= 100) {
+            carburantDisplay = `<span style="color: #f39c12; font-weight: bold;">${carburantRestant.toFixed(1)} L</span><br><small style="color: #f39c12;">⚠️ Attention</small>`;
+        }
+        
+        // Trouver la dernière maintenance terminée pour cet appareil
+        const tachesAppareil = taches.filter(t => t.appareilId === appareil.id && t.statut === 'terminee');
+        let derniereMaintenance = '<span style="color: #999;">Aucune</span>';
+        if (tachesAppareil.length > 0) {
+            // Trier par date décroissante
+            tachesAppareil.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const derniereTache = tachesAppareil[0];
+            const dateMaintenance = new Date(derniereTache.date);
+            const aujourdhui = new Date();
+            const joursEcoules = Math.floor((aujourdhui - dateMaintenance) / (1000 * 60 * 60 * 24));
+            
+            derniereMaintenance = `<strong>${derniereTache.date}</strong><br><small>Il y a ${joursEcoules} jour(s)</small>`;
+        }
+        
+        // Afficher la prochaine maintenance programmée
+        let prochaineMaintenance = '<span style="color: #999;">Non programmée</span>';
+        let prochaineMaintenanceClass = '';
+        
+        if (appareil.prochaineMaintenanceDate || appareil.prochaineMaintenanceHeures) {
+            const parts = [];
+            if (appareil.prochaineMaintenanceDate) {
+                const dateMaintenance = new Date(appareil.prochaineMaintenanceDate);
+                const aujourdhui = new Date();
+                const joursRestants = Math.ceil((dateMaintenance - aujourdhui) / (1000 * 60 * 60 * 24));
+                
+                if (joursRestants < 0) {
+                    prochaineMaintenanceClass = 'badge-indisponible';
+                    parts.push(`<strong>Date: ${appareil.prochaineMaintenanceDate}</strong><br><small style="color: #e74c3c;">⚠️ En retard de ${Math.abs(joursRestants)} jour(s)</small>`);
+                } else if (joursRestants <= 7) {
+                    prochaineMaintenanceClass = 'badge-planifiee';
+                    parts.push(`<strong>Date: ${appareil.prochaineMaintenanceDate}</strong><br><small style="color: #f39c12;">⚠️ Dans ${joursRestants} jour(s)</small>`);
+                } else {
+                    parts.push(`<strong>Date: ${appareil.prochaineMaintenanceDate}</strong><br><small>Dans ${joursRestants} jour(s)</small>`);
+                }
+            }
+            if (appareil.prochaineMaintenanceHeures) {
+                const heuresRestantes = appareil.prochaineMaintenanceHeures - appareil.heuresTotal;
+                if (heuresRestantes <= 0) {
+                    parts.push(`<strong>Heures: ${appareil.prochaineMaintenanceHeures.toFixed(1)}h</strong><br><small style="color: #e74c3c;">⚠️ Dépassé de ${Math.abs(heuresRestantes).toFixed(1)}h</small>`);
+                } else if (heuresRestantes <= 10) {
+                    parts.push(`<strong>Heures: ${appareil.prochaineMaintenanceHeures.toFixed(1)}h</strong><br><small style="color: #f39c12;">⚠️ Dans ${heuresRestantes.toFixed(1)}h</small>`);
+                } else {
+                    parts.push(`<strong>Heures: ${appareil.prochaineMaintenanceHeures.toFixed(1)}h</strong><br><small>Dans ${heuresRestantes.toFixed(1)}h</small>`);
+                }
+            }
+            prochaineMaintenance = parts.join('<br>');
+        }
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${appareil.id.substring(0, 8)}</td>
@@ -874,7 +941,10 @@ function loadAppareils() {
             <td>${appareil.modele}</td>
             <td>${appareil.immatriculation}</td>
             <td>${appareil.heuresTotal.toFixed(1)}h</td>
+            <td>${carburantDisplay}</td>
             <td><span class="badge ${statutClass}">${statutLabel}</span></td>
+            <td>${derniereMaintenance}</td>
+            <td>${prochaineMaintenance}</td>
             <td class="actions">
                 <button class="btn btn-edit" onclick="editAppareil('${appareil.id}')">Modifier</button>
                 <button class="btn btn-danger" onclick="deleteAppareil('${appareil.id}')">Supprimer</button>
@@ -894,6 +964,7 @@ function loadVols() {
     
     vols.forEach(vol => {
         const appareil = appareils.find(a => a.id === vol.appareilId);
+        const carburantConsomme = vol.carburantConsomme || 0;
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${vol.date}</td>
@@ -902,6 +973,7 @@ function loadVols() {
             <td>${vol.heuresFin.toFixed(1)}h</td>
             <td>${vol.duree.toFixed(1)}h</td>
             <td>${vol.pilote}</td>
+            <td><strong>${carburantConsomme.toFixed(1)} L</strong></td>
             <td class="actions">
                 <button class="btn btn-danger" onclick="deleteVol('${vol.id}')">Supprimer</button>
             </td>
@@ -998,11 +1070,6 @@ function loadTaches() {
                     ${techniciensList.map(t => `<span class="technicien-tag">${t}</span>`).join('')}
                 </div>
             </td>
-            <td>
-                ${(tache.documents || []).map((doc, i) => 
-                    `<a href="${doc}" target="_blank" class="document-link">Doc${i+1}</a>`
-                ).join('')}
-            </td>
             <td class="actions">
                 <button class="btn btn-edit" onclick="editTache('${tache.id}')">Modifier</button>
                 <button class="btn btn-sign" onclick="signerTache('${tache.id}')">Émarger</button>
@@ -1027,7 +1094,6 @@ function loadTechniciens() {
             <td>${technicien.prenom}</td>
             <td>${technicien.matricule}</td>
             <td>${technicien.qualification}</td>
-            <td>${technicien.email}</td>
             <td class="actions">
                 <button class="btn btn-edit" onclick="editTechnicien('${technicien.id}')">Modifier</button>
                 <button class="btn btn-danger" onclick="deleteTechnicien('${technicien.id}')">Supprimer</button>
@@ -1137,14 +1203,14 @@ function initializeDefaultData() {
     if (appareils.length === 0) {
         // Créer 8 appareils : 5 disponibles et 3 indisponibles
         const defaultAppareils = [
-            { id: 'APP001', type: 'Hélicoptère', modele: 'AS350 B3', immatriculation: 'F-ABCD', heuresTotal: 1250.5, statut: 'disponible' },
-            { id: 'APP002', type: 'Hélicoptère', modele: 'EC135', immatriculation: 'F-EFGH', heuresTotal: 980.2, statut: 'disponible' },
-            { id: 'APP003', type: 'Hélicoptère', modele: 'H125', immatriculation: 'F-IJKL', heuresTotal: 2100.8, statut: 'disponible' },
-            { id: 'APP004', type: 'Hélicoptère', modele: 'AS365 N3', immatriculation: 'F-MNOP', heuresTotal: 1750.3, statut: 'disponible' },
-            { id: 'APP005', type: 'Hélicoptère', modele: 'EC145', immatriculation: 'F-QRST', heuresTotal: 890.6, statut: 'disponible' },
-            { id: 'APP006', type: 'Hélicoptère', modele: 'AS350 B2', immatriculation: 'F-UVWX', heuresTotal: 3200.1, statut: 'indisponible' },
-            { id: 'APP007', type: 'Hélicoptère', modele: 'H130', immatriculation: 'F-YZAB', heuresTotal: 1450.9, statut: 'indisponible' },
-            { id: 'APP008', type: 'Hélicoptère', modele: 'EC135', immatriculation: 'F-CDEF', heuresTotal: 2650.4, statut: 'indisponible' }
+            { id: 'APP001', type: 'Hélicoptère', modele: 'AS350 B3', immatriculation: 'F-ABCD', heuresTotal: 1250.5, carburantRestant: 450.0, statut: 'disponible' },
+            { id: 'APP002', type: 'Hélicoptère', modele: 'EC135', immatriculation: 'F-EFGH', heuresTotal: 980.2, carburantRestant: 380.5, statut: 'disponible' },
+            { id: 'APP003', type: 'Hélicoptère', modele: 'H125', immatriculation: 'F-IJKL', heuresTotal: 2100.8, carburantRestant: 520.0, statut: 'disponible' },
+            { id: 'APP004', type: 'Hélicoptère', modele: 'AS365 N3', immatriculation: 'F-MNOP', heuresTotal: 1750.3, carburantRestant: 600.0, statut: 'disponible' },
+            { id: 'APP005', type: 'Hélicoptère', modele: 'EC145', immatriculation: 'F-QRST', heuresTotal: 890.6, carburantRestant: 320.0, statut: 'disponible' },
+            { id: 'APP006', type: 'Hélicoptère', modele: 'AS350 B2', immatriculation: 'F-UVWX', heuresTotal: 3200.1, carburantRestant: 150.0, statut: 'indisponible' },
+            { id: 'APP007', type: 'Hélicoptère', modele: 'H130', immatriculation: 'F-YZAB', heuresTotal: 1450.9, carburantRestant: 280.0, statut: 'indisponible' },
+            { id: 'APP008', type: 'Hélicoptère', modele: 'EC135', immatriculation: 'F-CDEF', heuresTotal: 2650.4, carburantRestant: 400.0, statut: 'indisponible' }
         ];
         Storage.set(STORAGE_KEYS.appareils, defaultAppareils);
     }
