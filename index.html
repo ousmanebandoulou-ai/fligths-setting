@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi des Appareils d'Hélicoptère</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛩️ Suivi des Appareils d'Hélicoptère</h1>
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="appareils">Appareils</button>
+                <button class="tab-btn" data-tab="reserves">Réserves de Vols</button>
+                <button class="tab-btn" data-tab="vols">Temps de Vol</button>
+                <button class="tab-btn" data-tab="maintenance">Maintenance</button>
+                <button class="tab-btn" data-tab="taches">Tâches</button>
+                <button class="tab-btn" data-tab="techniciens">Techniciens</button>
+                <button class="tab-btn" data-tab="emargements">Émargements</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Section Appareils -->
+            <section id="appareils" class="tab-content active">
+                <div class="section-header">
+                    <h2>Gestion des Appareils</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-appareil')">+ Ajouter un Appareil</button>
+                </div>
+                <div class="table-container">
+                    <table id="table-appareils">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>Modèle</th>
+                                <th>Immatriculation</th>
+                                <th>Heures Total</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-appareils"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section Réserves de Vols -->
+            <section id="reserves" class="tab-content">
+                <div class="section-header">
+                    <h2>Réserves de Vols</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-reserve')">+ Mettre une Réservation</button>
+                </div>
+                <div class="info-box" style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left-color: #28a745;">
+                    <strong>📅 Réservation de Vols :</strong> Planifiez vos vols à l'avance. Les réservations peuvent être converties en vols réels une fois effectuées.
+                </div>
+                <div class="table-container">
+                    <table id="table-reserves">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Heure Début</th>
+                                <th>Heure Fin</th>
+                                <th>Appareil</th>
+                                <th>Pilote</th>
+                                <th>Type de Vol</th>
+                                <th>Destination</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-reserves"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section Temps de Vol -->
+            <section id="vols" class="tab-content">
+                <div class="section-header">
+                    <h2>Enregistrement des Temps de Vol</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-vol')">+ Enregistrer un Vol</button>
+                </div>
+                <div class="info-box" style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left-color: #ffc107;">
+                    <strong>⚠️ Note :</strong> Seuls les appareils <strong>disponibles</strong> peuvent être sélectionnés pour l'enregistrement des vols.
+                </div>
+                <div class="table-container">
+                    <table id="table-vols">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Appareil</th>
+                                <th>Heures Début</th>
+                                <th>Heures Fin</th>
+                                <th>Durée</th>
+                                <th>Pilote</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-vols"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section Maintenance -->
+            <section id="maintenance" class="tab-content">
+                <div class="section-header">
+                    <h2>Types de Maintenance</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-maintenance-type')">+ Ajouter un Type</button>
+                </div>
+                <div class="table-container">
+                    <table id="table-maintenance-types">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Périodicité (heures)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-maintenance-types"></tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 40px;">
+                    <div class="section-header">
+                        <h2>Manuels de Maintenance</h2>
+                        <button class="btn btn-primary" onclick="openModal('modal-manuel')">+ Ajouter un Manuel</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="table-manuels">
+                            <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Titre</th>
+                                    <th>Version</th>
+                                    <th>Date Publication</th>
+                                    <th>Appareil(s)</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-manuels"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Tâches -->
+            <section id="taches" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Tâches</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-tache')">+ Mettre une Tâche</button>
+                </div>
+                <div class="info-box" style="background: #d1ecf1; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left-color: #17a2b8;">
+                    <strong>💡 Astuce :</strong> Après avoir créé une tâche, utilisez le bouton "Émarger" pour enregistrer la signature des techniciens ayant travaillé sur cette tâche.
+                </div>
+                <div class="table-container">
+                    <table id="table-taches">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Appareil</th>
+                                <th>Type Maintenance</th>
+                                <th>Manuel Utilisé</th>
+                                <th>Description</th>
+                                <th>Statut</th>
+                                <th>Techniciens</th>
+                                <th>Documents</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-taches"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section Techniciens -->
+            <section id="techniciens" class="tab-content">
+                <div class="section-header">
+                    <h2>Gestion des Techniciens</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-technicien')">+ Ajouter un Technicien</button>
+                </div>
+                <div class="info-box" style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>📋 Ordre de travail recommandé :</strong>
+                    <ol style="margin: 10px 0 0 20px;">
+                        <li>Ajouter les techniciens</li>
+                        <li>Vérifier/créer les appareils</li>
+                        <li>Définir les types de maintenance</li>
+                        <li>Mettre les tâches de maintenance</li>
+                        <li>Enregistrer les temps de vol (appareils disponibles uniquement)</li>
+                        <li>Émarger les techniciens après chaque tâche</li>
+                    </ol>
+                </div>
+                <div class="table-container">
+                    <table id="table-techniciens">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Matricule</th>
+                                <th>Qualification</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-techniciens"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Techniciens par Appareil</h3>
+                    <div id="techniciens-par-appareil" class="techniciens-grid"></div>
+                </div>
+            </section>
+
+            <!-- Section Émargements -->
+            <section id="emargements" class="tab-content">
+                <div class="section-header">
+                    <h2>Émargements des Techniciens</h2>
+                    <button class="btn btn-primary" onclick="openModal('modal-emargement')">+ Enregistrer un Émargement</button>
+                </div>
+                <div class="table-container">
+                    <table id="table-emargements">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Tâche</th>
+                                <th>Appareil</th>
+                                <th>Technicien</th>
+                                <th>Heure Début</th>
+                                <th>Heure Fin</th>
+                                <th>Signature</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-emargements"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Modal Appareil -->
+    <div id="modal-appareil" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-appareil')">&times;</span>
+            <h2>Ajouter/Modifier un Appareil</h2>
+            <form id="form-appareil">
+                <input type="hidden" id="appareil-id">
+                <div class="form-group">
+                    <label>Type:</label>
+                    <input type="text" id="appareil-type" required>
+                </div>
+                <div class="form-group">
+                    <label>Modèle:</label>
+                    <input type="text" id="appareil-modele" required>
+                </div>
+                <div class="form-group">
+                    <label>Immatriculation:</label>
+                    <input type="text" id="appareil-immatriculation" required>
+                </div>
+                <div class="form-group">
+                    <label>Heures Total (initiales):</label>
+                    <input type="number" id="appareil-heures" step="0.1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Statut:</label>
+                    <select id="appareil-statut" required>
+                        <option value="disponible">Disponible</option>
+                        <option value="indisponible">Indisponible</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Vol -->
+    <div id="modal-vol" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-vol')">&times;</span>
+            <h2>Enregistrer un Vol</h2>
+            <form id="form-vol">
+                <input type="hidden" id="vol-id">
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="vol-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Appareil:</label>
+                    <select id="vol-appareil" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Heures Début:</label>
+                    <input type="number" id="vol-heures-debut" step="0.1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Heures Fin:</label>
+                    <input type="number" id="vol-heures-fin" step="0.1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Pilote:</label>
+                    <input type="text" id="vol-pilote" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Type de Maintenance -->
+    <div id="modal-maintenance-type" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-maintenance-type')">&times;</span>
+            <h2>Ajouter/Modifier un Type de Maintenance</h2>
+            <form id="form-maintenance-type">
+                <input type="hidden" id="maintenance-type-id">
+                <div class="form-group">
+                    <label>Type:</label>
+                    <input type="text" id="maintenance-type-nom" required>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="maintenance-type-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Périodicité (heures):</label>
+                    <input type="number" id="maintenance-type-periodicite" step="0.1" min="0" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Tâche -->
+    <div id="modal-tache" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-tache')">&times;</span>
+            <h2>Mettre/Modifier une Tâche</h2>
+            <form id="form-tache">
+                <input type="hidden" id="tache-id">
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="tache-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Appareil:</label>
+                    <select id="tache-appareil" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Type de Maintenance:</label>
+                    <select id="tache-maintenance-type" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Manuel de Maintenance Utilisé:</label>
+                    <select id="tache-manuel" required>
+                        <option value="">Sélectionner un manuel</option>
+                    </select>
+                    <small>Le manuel utilisé pour effectuer cette tâche de maintenance</small>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="tache-description" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Statut:</label>
+                    <select id="tache-statut" required>
+                        <option value="planifiee">Planifiée</option>
+                        <option value="en-cours">En Cours</option>
+                        <option value="terminee">Terminée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Techniciens:</label>
+                    <select id="tache-techniciens" multiple required></select>
+                    <small>Sélectionnez plusieurs techniciens (Ctrl+clic)</small>
+                </div>
+                <div class="form-group">
+                    <label>Documents (URLs séparées par des virgules):</label>
+                    <textarea id="tache-documents" rows="2" placeholder="https://exemple.com/doc1.pdf, https://exemple.com/doc2.pdf"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Technicien -->
+    <div id="modal-technicien" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-technicien')">&times;</span>
+            <h2>Ajouter/Modifier un Technicien</h2>
+            <form id="form-technicien">
+                <input type="hidden" id="technicien-id">
+                <div class="form-group">
+                    <label>Nom:</label>
+                    <input type="text" id="technicien-nom" required>
+                </div>
+                <div class="form-group">
+                    <label>Prénom:</label>
+                    <input type="text" id="technicien-prenom" required>
+                </div>
+                <div class="form-group">
+                    <label>Matricule:</label>
+                    <input type="text" id="technicien-matricule" required>
+                </div>
+                <div class="form-group">
+                    <label>Qualification:</label>
+                    <input type="text" id="technicien-qualification" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="technicien-email" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Émargement -->
+    <div id="modal-emargement" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-emargement')">&times;</span>
+            <h2>Enregistrer un Émargement</h2>
+            <form id="form-emargement">
+                <input type="hidden" id="emargement-id">
+                <div class="form-group">
+                    <label>Tâche:</label>
+                    <select id="emargement-tache" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Technicien:</label>
+                    <select id="emargement-technicien" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="emargement-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Heure Début:</label>
+                    <input type="time" id="emargement-heure-debut" required>
+                </div>
+                <div class="form-group">
+                    <label>Heure Fin:</label>
+                    <input type="time" id="emargement-heure-fin" required>
+                </div>
+                <div class="form-group">
+                    <label>Signature (nom):</label>
+                    <input type="text" id="emargement-signature" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Manuel de Maintenance -->
+    <div id="modal-manuel" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-manuel')">&times;</span>
+            <h2>Ajouter/Modifier un Manuel de Maintenance</h2>
+            <form id="form-manuel">
+                <input type="hidden" id="manuel-id">
+                <div class="form-group">
+                    <label>Référence:</label>
+                    <input type="text" id="manuel-reference" required placeholder="Ex: AMM-AS350-B3-Rev15">
+                </div>
+                <div class="form-group">
+                    <label>Titre:</label>
+                    <input type="text" id="manuel-titre" required placeholder="Ex: Aircraft Maintenance Manual AS350 B3">
+                </div>
+                <div class="form-group">
+                    <label>Version:</label>
+                    <input type="text" id="manuel-version" required placeholder="Ex: Rev. 15">
+                </div>
+                <div class="form-group">
+                    <label>Date de Publication:</label>
+                    <input type="date" id="manuel-date-publication" required>
+                </div>
+                <div class="form-group">
+                    <label>Appareil(s) concerné(s):</label>
+                    <select id="manuel-appareils" multiple required></select>
+                    <small>Sélectionnez un ou plusieurs appareils (Ctrl+clic pour sélection multiple)</small>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="manuel-description" rows="3" placeholder="Description du manuel..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Réservation de Vol -->
+    <div id="modal-reserve" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-reserve')">&times;</span>
+            <h2>Mettre/Modifier une Réservation de Vol</h2>
+            <form id="form-reserve">
+                <input type="hidden" id="reserve-id">
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" id="reserve-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Heure Début:</label>
+                    <input type="time" id="reserve-heure-debut" required>
+                </div>
+                <div class="form-group">
+                    <label>Heure Fin:</label>
+                    <input type="time" id="reserve-heure-fin" required>
+                </div>
+                <div class="form-group">
+                    <label>Appareil:</label>
+                    <select id="reserve-appareil" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Pilote:</label>
+                    <input type="text" id="reserve-pilote" required>
+                </div>
+                <div class="form-group">
+                    <label>Type de Vol:</label>
+                    <select id="reserve-type-vol" required>
+                        <option value="entrainement">Entraînement</option>
+                        <option value="transport">Transport</option>
+                        <option value="secours">Secours</option>
+                        <option value="surveillance">Surveillance</option>
+                        <option value="touristique">Touristique</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Destination:</label>
+                    <input type="text" id="reserve-destination" placeholder="Ex: Paris, Lyon, etc.">
+                </div>
+                <div class="form-group">
+                    <label>Statut:</label>
+                    <select id="reserve-statut" required>
+                        <option value="planifiee">Planifiée</option>
+                        <option value="confirmee">Confirmée</option>
+                        <option value="en-cours">En Cours</option>
+                        <option value="terminee">Terminée</option>
+                        <option value="annulee">Annulée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Remarques:</label>
+                    <textarea id="reserve-remarques" rows="3" placeholder="Notes supplémentaires..."></textarea>
+                </div>
+                <div class="form-group" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <button type="button" class="btn btn-edit" onclick="convertirReserveEnVol()" id="btn-convertir-vol" style="display: none;">Convertir en Vol</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
