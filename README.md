@@ -6,8 +6,12 @@ Application web complète pour la gestion et le suivi des appareils d'hélicopt�
 
 ### Gestion des Appareils
 - Suivi de 8 appareils (5 disponibles, 3 indisponibles)
+- **Appareils disponibles** : 6W-HTB, 6W-HTC, 6W-SHT, 6W-HCA, 6W-SHY
+- **Appareils indisponibles** : 6W-HCD, 6W-SHZ, 6W-SHU
 - Enregistrement des heures de vol totales
+- Suivi du carburant restant
 - Statut disponible/indisponible
+- Gestion des prochaines maintenances (date et heures)
 
 ### Réserves de Vols
 - Planification des vols à l'avance

@@ -1208,9 +1208,9 @@ function initializeDefaultData() {
             { id: 'APP003', type: 'Hélicoptère', modele: 'H125', immatriculation: '6W-HCA', heuresTotal: 2100.8, carburantRestant: 520.0, statut: 'disponible' },
             { id: 'APP004', type: 'Hélicoptère', modele: 'AS365 N3', immatriculation: '6W-SHY', heuresTotal: 1750.3, carburantRestant: 600.0, statut: 'disponible' },
             { id: 'APP005', type: 'Hélicoptère', modele: 'EC145', immatriculation: '6W-SHT', heuresTotal: 890.6, carburantRestant: 320.0, statut: 'disponible' },
-            { id: 'APP006', type: 'Hélicoptère', modele: 'AS350 B2', immatriculation: 'F-UVWX', heuresTotal: 3200.1, carburantRestant: 150.0, statut: 'indisponible' },
-            { id: 'APP007', type: 'Hélicoptère', modele: 'H130', immatriculation: 'F-YZAB', heuresTotal: 1450.9, carburantRestant: 280.0, statut: 'indisponible' },
-            { id: 'APP008', type: 'Hélicoptère', modele: 'EC135', immatriculation: 'F-CDEF', heuresTotal: 2650.4, carburantRestant: 400.0, statut: 'indisponible' }
+            { id: 'APP006', type: 'Hélicoptère', modele: 'AS350 B2', immatriculation: '6W-HCD', heuresTotal: 3200.1, carburantRestant: 150.0, statut: 'indisponible' },
+            { id: 'APP007', type: 'Hélicoptère', modele: 'H130', immatriculation: '6W-SHZ', heuresTotal: 1450.9, carburantRestant: 280.0, statut: 'indisponible' },
+            { id: 'APP008', type: 'Hélicoptère', modele: 'EC135', immatriculation: '6W-SHU', heuresTotal: 2650.4, carburantRestant: 400.0, statut: 'indisponible' }
         ];
         Storage.set(STORAGE_KEYS.appareils, defaultAppareils);
     }
